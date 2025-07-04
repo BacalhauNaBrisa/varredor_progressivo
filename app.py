@@ -11,7 +11,7 @@ LOGO_URL = "https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/ass
 
 # Page config
 st.set_page_config(
-    page_title="Varredor Progressivo 🎸",
+    page_title="Varredor Progressivo",
     page_icon="https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/assets/logo.ico",
     layout="centered"
 )
@@ -110,7 +110,7 @@ else:
 # Sidebar UI
 st.sidebar.image(LOGO_URL, width=150)
 st.sidebar.markdown(f"🗓️ {get_last_modified_date_from_github()}")
-st.sidebar.title("🎸 Varredor Progressivo")
+st.sidebar.title("Varredor Progressivo")
 st.sidebar.markdown("Explore artistas e álbuns de rock progressivo")
 
 # Theme toggle
