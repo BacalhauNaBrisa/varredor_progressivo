@@ -12,7 +12,7 @@ LOGO_URL = "https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/ass
 # Page config
 st.set_page_config(
     page_title="Varredor Progressivo 🎸",
-    page_icon="https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/assets/logo.png",
+    page_icon="https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/assets/logo.ico",
     layout="centered"
 )
 
