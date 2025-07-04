@@ -5,6 +5,7 @@ import numpy as np
 
 # Constants
 CSV_URL = "https://raw.githubusercontent.com/BacalhauNaBrisa/varredor_progressivo/main/progarchives_all_artists_albums.csv"
+LOGO_URL = "https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/assets/logo.png"
 
 @st.cache_data
 def load_data():
@@ -52,6 +53,7 @@ def show_world_map(df):
 
 # Streamlit App Layout
 st.set_page_config(page_title="Varredor Progressivo", layout="wide")
+st.image(LOGO_URL, width=200)
 st.title("🎸 Varredor Progressivo")
 st.markdown("Explore progressive rock albums by artist, country, rating, and more!")
 
