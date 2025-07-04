@@ -55,7 +55,9 @@ GITHUB_TOKEN = "ghp_seu_token_aqui"
 streamlit run app.py
 ```
 
-🚀 Deploy no Streamlit Cloud
+---
+
+## 🚀 Deploy no Streamlit Cloud
 
 1. Suba este projeto para um repositório GitHub (já está pronto para isso)
 
@@ -71,18 +73,9 @@ GITHUB_TOKEN = "ghp_seu_token_aqui"
 
 5. Clique em "Deploy"
 
-📁 Estrutura do Projeto
+---
 
-varredor_progressivo/
-├── app.py
-├── requirements.txt
-├── progarchives_all_artists_albums.csv
-├── assets/
-│   └── logo.png
-└── .streamlit/
-    └── config.toml
-
-🧮 Fórmula do Weighted Rating
+## 🧮 Fórmula do Weighted Rating
 
 A nota ponderada é calculada com base na média bayesiana:
 
@@ -100,10 +93,16 @@ Onde:
 
     C = média global das notas de todos os álbuns com pelo menos 1 avaliação
 
-📅 Última atualização automática
+---
+
+## 📅 Última atualização automática
 
 A data da última atualização do CSV é buscada diretamente via GitHub API e exibida no topo da aplicação. Caso falhe, exibe "Last updated on July 04, 2025"
 
-📜 Licença
+---
+
+## 📜 Licença
 
 MIT — sinta-se livre para usar, modificar e contribuir!
+
+---
