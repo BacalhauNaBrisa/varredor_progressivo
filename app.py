@@ -51,7 +51,7 @@ def get_country_map(df):
         title='🌍 Número de Álbuns por País',
     )
 
-    fig.update_layout(clickmode='event+select')
+    fig.update_layout(margin=dict(l=0, r=0, t=30, b=0))
     return fig
 
 # Load and process data
@@ -61,7 +61,7 @@ data = compute_weighted_rating(data)
 # Mapa
 st.subheader("🌍 Mapa Interativo por País")
 map_fig = get_country_map(data)
-map_click = st.plotly_chart(map_fig, use_container_width=True)
+st.plotly_chart(map_fig, use_container_width=True)
 
 # Filtros
 st.subheader("🎛️ Filtros")
@@ -80,28 +80,17 @@ with st.expander("Mostrar/Ocultar Filtros"):
 
     reset_filters = st.button("🔄 Resetar Filtros")
 
-# Map click
-clicked_country = None
-if map_click and map_click.selection and 'points' in map_click.selection:
-    points = map_click.selection['points']
-    if points:
-        clicked_country = points[0].get('location')
-
 # Reset
 if reset_filters:
     selected_country = "Todos"
     selected_styles = []
     selected_years = []
-    clicked_country = None
     st.experimental_rerun()
 
-# Filtered data
+# Apply filters
 filtered_data = data.copy()
 
-if clicked_country:
-    filtered_data = filtered_data[filtered_data['country'] == clicked_country]
-    st.info(f"País selecionado no mapa: **{clicked_country}**")
-elif selected_country != "Todos":
+if selected_country != "Todos":
     filtered_data = filtered_data[filtered_data['country'] == selected_country]
 
 if selected_styles:
@@ -160,7 +149,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.markdown("#### Por Estilo")
-    for style in selected_styles[:1]:  # Show top 10 for the first selected style
+    for style in selected_styles[:1]:  # Show only first selected style
         st.markdown(f"**Estilo:** {style}")
         top_by_style = (
             filtered_data[filtered_data['style'] == style]
@@ -171,11 +160,10 @@ with col1:
 
 with col2:
     st.markdown("#### Por País")
-    country_to_show = clicked_country if clicked_country else (selected_country if selected_country != "Todos" else None)
-    if country_to_show:
-        st.markdown(f"**País:** {country_to_show}")
+    if selected_country != "Todos":
+        st.markdown(f"**País:** {selected_country}")
         top_by_country = (
-            filtered_data[filtered_data['country'] == country_to_show]
+            filtered_data[filtered_data['country'] == selected_country]
             .sort_values(by='Weighted Rating', ascending=False)
             .head(10)
         )
