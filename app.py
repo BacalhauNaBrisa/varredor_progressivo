@@ -10,7 +10,12 @@ CSV_URL = "https://raw.githubusercontent.com/BacalhauNaBrisa/varredor_progressiv
 LOGO_URL = "https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/assets/logo.png"
 
 # Page config
-st.set_page_config(page_title="Varredor Progressivo", layout="centered")
+st.set_page_config(
+    page_title="Varredor Progressivo 🎸",
+    page_icon="https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/assets/logo.png",
+    layout="centered"
+)
+
 
 # Get last updated date of CSV from GitHub API with fallback
 @st.cache_data(ttl=3600)
