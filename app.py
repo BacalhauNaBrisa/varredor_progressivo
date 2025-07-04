@@ -2,15 +2,34 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import numpy as np
+import requests
+from datetime import datetime
 
 # Constants
 CSV_URL = "https://raw.githubusercontent.com/BacalhauNaBrisa/varredor_progressivo/main/progarchives_all_artists_albums.csv"
 LOGO_URL = "https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/assets/logo.png"
 
-# Page config with centered layout for mobile-friendly
+# Page config
 st.set_page_config(page_title="Varredor Progressivo", layout="centered")
 
-# Load and cache data once
+# Get last updated date of CSV from GitHub API
+@st.cache_data(ttl=3600)
+def get_last_modified_date_from_github():
+    api_url = "https://api.github.com/repos/BacalhauNaBrisa/varredor_progressivo/commits"
+    params = {"path": "progarchives_all_artists_albums.csv", "per_page": 1}
+    headers = {"Accept": "application/vnd.github+json"}
+    try:
+        response = requests.get(api_url, params=params, headers=headers)
+        if response.status_code == 200:
+            commit_date = response.json()[0]["commit"]["committer"]["date"]
+            dt = datetime.strptime(commit_date, "%Y-%m-%dT%H:%M:%SZ")
+            return dt.strftime("Last updated on %B %d, %Y")
+        else:
+            return "Last updated: unknown"
+    except Exception:
+        return "Last updated: error"
+
+# Load and cache data
 @st.cache_data(show_spinner=True)
 def load_data():
     df = pd.read_csv(CSV_URL)
@@ -22,8 +41,7 @@ def load_data():
 def compute_weighted_rating(df):
     valid_ratings = df[df['num_ratings'] > 0]
     if valid_ratings.empty:
-        C = 0
-        m = 0
+        C, m = 0, 0
     else:
         C = valid_ratings['rating'].mean()
         m = valid_ratings['num_ratings'].quantile(0.75)
@@ -56,51 +74,36 @@ def get_country_map(df):
 data = load_data()
 data = compute_weighted_rating(data)
 
-# Theme toggle logic with session state
+# Theme toggle logic
 if "theme" not in st.session_state:
     st.session_state.theme = "light"
 
 def toggle_theme():
     st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
 
-# Apply basic theme styles with CSS injection
+# Apply theme CSS
 if st.session_state.theme == "dark":
-    st.markdown(
-        """
+    st.markdown("""
         <style>
-        .main {
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-        .sidebar .sidebar-content {
-            background-color: #1f1f1f;
-        }
+        .main { background-color: #121212; color: #e0e0e0; }
+        .sidebar .sidebar-content { background-color: #1f1f1f; }
         </style>
-        """,
-        unsafe_allow_html=True
-    )
+    """, unsafe_allow_html=True)
 else:
-    st.markdown(
-        """
+    st.markdown("""
         <style>
-        .main {
-            background-color: white;
-            color: black;
-        }
-        .sidebar .sidebar-content {
-            background-color: #f0f2f6;
-        }
+        .main { background-color: white; color: black; }
+        .sidebar .sidebar-content { background-color: #f0f2f6; }
         </style>
-        """,
-        unsafe_allow_html=True
-    )
+    """, unsafe_allow_html=True)
 
-# Sidebar UI: Logo and title
+# Sidebar UI
 st.sidebar.image(LOGO_URL, width=150)
+st.sidebar.markdown(f"🗓️ {get_last_modified_date_from_github()}")
 st.sidebar.title("🎸 Varredor Progressivo")
 st.sidebar.markdown("Explore artistas e álbuns de rock progressivo")
 
-# Theme toggle button in sidebar
+# Theme toggle
 st.sidebar.markdown("---")
 st.sidebar.write("**Tema:**")
 st.sidebar.button(
@@ -108,7 +111,7 @@ st.sidebar.button(
     on_click=toggle_theme
 )
 
-# Initialize filters in session state if missing
+# Initialize filter state
 if "selected_country" not in st.session_state:
     st.session_state.selected_country = "Todos"
 if "selected_styles" not in st.session_state:
@@ -116,7 +119,6 @@ if "selected_styles" not in st.session_state:
 if "selected_years" not in st.session_state:
     st.session_state.selected_years = []
 
-# Reset filters function
 def reset_filters():
     st.session_state.selected_country = "Todos"
     st.session_state.selected_styles = []
@@ -129,21 +131,21 @@ country_options = ["Todos"] + sorted(data['country'].dropna().unique().tolist())
 style_options = sorted(data['style'].dropna().unique().tolist())
 year_options = sorted(data['year'].dropna().unique().astype(int))
 
-selected_country = st.sidebar.selectbox(
+st.sidebar.selectbox(
     "Filtrar por País",
     country_options,
     index=country_options.index(st.session_state.selected_country),
     key="selected_country"
 )
 
-selected_styles = st.sidebar.multiselect(
+st.sidebar.multiselect(
     "Filtrar por Estilo(s)",
     style_options,
     default=st.session_state.selected_styles,
     key="selected_styles"
 )
 
-selected_years = st.sidebar.multiselect(
+st.sidebar.multiselect(
     "Filtrar por Ano(s)",
     year_options,
     default=st.session_state.selected_years,
@@ -152,25 +154,24 @@ selected_years = st.sidebar.multiselect(
 
 st.sidebar.button("🔄 Resetar Filtros", on_click=reset_filters)
 
-# Show main map
+# Display country map
 st.subheader("🌍 Mapa Interativo por País")
-map_fig = get_country_map(data)
-st.plotly_chart(map_fig, use_container_width=True)
+st.plotly_chart(get_country_map(data), use_container_width=True)
 
-# Apply filters
+# Filter data
 filtered_data = data.copy()
-if selected_country != "Todos":
-    filtered_data = filtered_data[filtered_data['country'] == selected_country]
-if selected_styles:
-    filtered_data = filtered_data[filtered_data['style'].isin(selected_styles)]
-if selected_years:
-    filtered_data = filtered_data[filtered_data['year'].isin(selected_years)]
+if st.session_state.selected_country != "Todos":
+    filtered_data = filtered_data[filtered_data['country'] == st.session_state.selected_country]
+if st.session_state.selected_styles:
+    filtered_data = filtered_data[filtered_data['style'].isin(st.session_state.selected_styles)]
+if st.session_state.selected_years:
+    filtered_data = filtered_data[filtered_data['year'].isin(st.session_state.selected_years)]
 
 # Show filtered table
 st.subheader("📊 Tabela de Álbuns Filtrados")
 st.dataframe(filtered_data.sort_values(by='Weighted Rating', ascending=False), use_container_width=True)
 
-# Export CSV button
+# Export filtered data
 st.download_button(
     label="📥 Exportar CSV Filtrado",
     data=filtered_data.to_csv(index=False).encode('utf-8'),
@@ -178,7 +179,7 @@ st.download_button(
     mime='text/csv'
 )
 
-# Show aggregated stats
+# Aggregated statistics
 st.subheader("📈 Estatísticas Agrupadas")
 col1, col2 = st.columns(2)
 
@@ -204,13 +205,13 @@ with col2:
     )
     st.dataframe(avg_weighted_by_country, use_container_width=True)
 
-# Top 10 Albums
+# Top 10 albums
 st.subheader("🏆 Top 10 Álbuns")
 col1, col2 = st.columns(2)
 
 with col1:
     st.markdown("#### Por Estilo")
-    for style in selected_styles[:1]:
+    for style in st.session_state.selected_styles[:1]:
         st.markdown(f"**Estilo:** {style}")
         top_by_style = (
             filtered_data[filtered_data['style'] == style]
@@ -221,10 +222,10 @@ with col1:
 
 with col2:
     st.markdown("#### Por País")
-    if selected_country != "Todos":
-        st.markdown(f"**País:** {selected_country}")
+    if st.session_state.selected_country != "Todos":
+        st.markdown(f"**País:** {st.session_state.selected_country}")
         top_by_country = (
-            filtered_data[filtered_data['country'] == selected_country]
+            filtered_data[filtered_data['country'] == st.session_state.selected_country]
             .sort_values(by='Weighted Rating', ascending=False)
             .head(10)
         )
