@@ -17,22 +17,22 @@ st.set_page_config(page_title="Varredor Progressivo", layout="centered")
 def get_last_modified_date_from_github():
     api_url = "https://api.github.com/repos/BacalhauNaBrisa/varredor_progressivo/commits"
     params = {"path": "progarchives_all_artists_albums.csv", "per_page": 1}
-    headers = {"Accept": "application/vnd.github+json"}
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {st.secrets['GITHUB_TOKEN']}"
+    }
     try:
         resp = requests.get(api_url, params=params, headers=headers, timeout=10)
         if resp.status_code != 200:
-            st.error(f"GitHub API error: {resp.status_code}")
-            return "Last updated: unknown"
+            return f"Last updated: error {resp.status_code}"
         data = resp.json()
         if not isinstance(data, list) or not data:
-            st.error("No commit data found for CSV file.")
-            return "Last updated: unknown"
+            return "Last updated: no data"
         dt_str = data[0]["commit"]["committer"]["date"]
         dt = datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%SZ")
         return dt.strftime("Last updated on %B %d, %Y")
     except Exception as e:
-        st.error(f"Error fetching GitHub date: {e}")
-        return "Last updated: unknown"
+        return "Last updated: error"
 
 # Load and cache data
 @st.cache_data(show_spinner=True)
