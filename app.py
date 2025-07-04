@@ -7,8 +7,8 @@ import numpy as np
 CSV_URL = "https://raw.githubusercontent.com/BacalhauNaBrisa/varredor_progressivo/main/progarchives_all_artists_albums.csv"
 LOGO_URL = "https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/assets/logo.png"
 
-# Page config with centered layout to look good on desktop and mobile
-st.set_page_config(page_title="Varredor Progressivo", layout="wide")
+# Page config with centered layout for mobile-friendly
+st.set_page_config(page_title="Varredor Progressivo", layout="centered")
 
 # Load and cache data once
 @st.cache_data(show_spinner=True)
@@ -95,7 +95,7 @@ else:
         unsafe_allow_html=True
     )
 
-# Show logo and title
+# Sidebar UI: Logo and title
 st.sidebar.image(LOGO_URL, width=150)
 st.sidebar.title("🎸 Varredor Progressivo")
 st.sidebar.markdown("Explore artistas e álbuns de rock progressivo")
@@ -103,14 +103,23 @@ st.sidebar.markdown("Explore artistas e álbuns de rock progressivo")
 # Theme toggle button in sidebar
 st.sidebar.markdown("---")
 st.sidebar.write("**Tema:**")
-st.sidebar.button(f"Trocar para {'Dark' if st.session_state.theme=='light' else 'Light'} Mode", on_click=toggle_theme)
+st.sidebar.button(
+    f"Trocar para {'Dark' if st.session_state.theme == 'light' else 'Light'} Mode",
+    on_click=toggle_theme
+)
 
-# Initialize filters in session state if not present
+# Initialize filters in session state if missing
 if "selected_country" not in st.session_state:
     st.session_state.selected_country = "Todos"
 if "selected_styles" not in st.session_state:
     st.session_state.selected_styles = []
 if "selected_years" not in st.session_state:
+    st.session_state.selected_years = []
+
+# Reset filters function
+def reset_filters():
+    st.session_state.selected_country = "Todos"
+    st.session_state.selected_styles = []
     st.session_state.selected_years = []
 
 # Sidebar filters
@@ -121,20 +130,27 @@ style_options = sorted(data['style'].dropna().unique().tolist())
 year_options = sorted(data['year'].dropna().unique().astype(int))
 
 selected_country = st.sidebar.selectbox(
-    "Filtrar por País", country_options, index=country_options.index(st.session_state.selected_country), key="selected_country"
-)
-selected_styles = st.sidebar.multiselect(
-    "Filtrar por Estilo(s)", style_options, default=st.session_state.selected_styles, key="selected_styles"
-)
-selected_years = st.sidebar.multiselect(
-    "Filtrar por Ano(s)", year_options, default=st.session_state.selected_years, key="selected_years"
+    "Filtrar por País",
+    country_options,
+    index=country_options.index(st.session_state.selected_country),
+    key="selected_country"
 )
 
-if st.sidebar.button("🔄 Resetar Filtros"):
-    st.session_state.selected_country = "Todos"
-    st.session_state.selected_styles = []
-    st.session_state.selected_years = []
-    st.experimental_rerun()
+selected_styles = st.sidebar.multiselect(
+    "Filtrar por Estilo(s)",
+    style_options,
+    default=st.session_state.selected_styles,
+    key="selected_styles"
+)
+
+selected_years = st.sidebar.multiselect(
+    "Filtrar por Ano(s)",
+    year_options,
+    default=st.session_state.selected_years,
+    key="selected_years"
+)
+
+st.sidebar.button("🔄 Resetar Filtros", on_click=reset_filters)
 
 # Show main map
 st.subheader("🌍 Mapa Interativo por País")
