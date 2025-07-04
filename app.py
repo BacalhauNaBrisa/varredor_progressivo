@@ -3,17 +3,17 @@ import pandas as pd
 import plotly.express as px
 import numpy as np
 
-# Constants
+# Configurações da página
+st.set_page_config(page_title="Varredor Progressivo", layout="centered")
+
+# Constantes
 CSV_URL = "https://raw.githubusercontent.com/BacalhauNaBrisa/varredor_progressivo/main/progarchives_all_artists_albums.csv"
 LOGO_URL = "https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/assets/logo.png"
 
-# Config
-st.set_page_config(page_title="Varredor Progressivo", layout="wide")
-
-# Show logo and title
+# Logo e título
 st.image(LOGO_URL, width=200)
 st.title("🎸 Varredor Progressivo")
-st.markdown("Explore artistas e álbuns de rock progressivo de forma interativa com filtros, mapa mundial e avaliações ponderadas!")
+st.markdown("Explore artistas e álbuns de rock progressivo com filtros, mapa mundial e avaliações ponderadas!")
 
 @st.cache_data
 def load_data():
@@ -41,7 +41,6 @@ def compute_weighted_rating(df):
 def get_country_map(df):
     country_counts = df['country'].value_counts().reset_index()
     country_counts.columns = ['country', 'count']
-
     fig = px.choropleth(
         country_counts,
         locations='country',
@@ -50,15 +49,22 @@ def get_country_map(df):
         color_continuous_scale='Viridis',
         title='🌍 Número de Álbuns por País',
     )
-
     fig.update_layout(margin=dict(l=0, r=0, t=30, b=0))
     return fig
 
-# Load and process data
+# Carregar e processar dados
 data = load_data()
 data = compute_weighted_rating(data)
 
-# Mapa
+# Inicializar session state
+if "selected_country" not in st.session_state:
+    st.session_state.selected_country = "Todos"
+if "selected_styles" not in st.session_state:
+    st.session_state.selected_styles = []
+if "selected_years" not in st.session_state:
+    st.session_state.selected_years = []
+
+# Mostrar mapa
 st.subheader("🌍 Mapa Interativo por País")
 map_fig = get_country_map(data)
 st.plotly_chart(map_fig, use_container_width=True)
@@ -69,25 +75,37 @@ with st.expander("Mostrar/Ocultar Filtros"):
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        selected_country = st.selectbox("Filtrar por País", ["Todos"] + sorted(data['country'].dropna().unique().tolist()))
+        selected_country = st.selectbox(
+            "Filtrar por País",
+            ["Todos"] + sorted(data['country'].dropna().unique().tolist()),
+            index=(["Todos"] + sorted(data['country'].dropna().unique().tolist())).index(st.session_state.selected_country),
+            key="selected_country"
+        )
 
     with col2:
-        selected_styles = st.multiselect("Filtrar por Estilo(s)", sorted(data['style'].dropna().unique().tolist()), default=[])
+        selected_styles = st.multiselect(
+            "Filtrar por Estilo(s)",
+            sorted(data['style'].dropna().unique().tolist()),
+            default=st.session_state.selected_styles,
+            key="selected_styles"
+        )
 
     with col3:
         available_years = sorted(data['year'].dropna().unique().astype(int))
-        selected_years = st.multiselect("Filtrar por Ano(s)", available_years, default=[])
+        selected_years = st.multiselect(
+            "Filtrar por Ano(s)",
+            available_years,
+            default=st.session_state.selected_years,
+            key="selected_years"
+        )
 
-    reset_filters = st.button("🔄 Resetar Filtros")
+    if st.button("🔄 Resetar Filtros"):
+        st.session_state.selected_country = "Todos"
+        st.session_state.selected_styles = []
+        st.session_state.selected_years = []
+        st.experimental_rerun()
 
-# Reset
-if reset_filters:
-    selected_country = "Todos"
-    selected_styles = []
-    selected_years = []
-    st.experimental_rerun()
-
-# Apply filters
+# Aplicar filtros
 filtered_data = data.copy()
 
 if selected_country != "Todos":
@@ -99,15 +117,14 @@ if selected_styles:
 if selected_years:
     filtered_data = filtered_data[filtered_data['year'].isin(selected_years)]
 
-# Tabela de dados
+# Tabela principal
 st.subheader("📊 Tabela de Álbuns Filtrados")
-
 st.dataframe(
     filtered_data.sort_values(by='Weighted Rating', ascending=False),
     use_container_width=True
 )
 
-# Export CSV
+# Exportar CSV
 st.download_button(
     label="📥 Exportar CSV Filtrado",
     data=filtered_data.to_csv(index=False).encode('utf-8'),
@@ -117,7 +134,6 @@ st.download_button(
 
 # Estatísticas agrupadas
 st.subheader("📈 Estatísticas Agrupadas")
-
 col1, col2 = st.columns(2)
 
 with col1:
@@ -142,14 +158,13 @@ with col2:
     )
     st.dataframe(avg_weighted_by_country, use_container_width=True)
 
-# Top 10 Álbuns
+# Top 10 álbuns
 st.subheader("🏆 Top 10 Álbuns")
-
 col1, col2 = st.columns(2)
 
 with col1:
     st.markdown("#### Por Estilo")
-    for style in selected_styles[:1]:  # Show only first selected style
+    for style in selected_styles[:1]:
         st.markdown(f"**Estilo:** {style}")
         top_by_style = (
             filtered_data[filtered_data['style'] == style]
