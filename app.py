@@ -12,27 +12,27 @@ LOGO_URL = "https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/ass
 # Page config
 st.set_page_config(page_title="Varredor Progressivo", layout="centered")
 
-# Get last updated date of CSV from GitHub API
+# Get last updated date of CSV from GitHub API with fallback
 @st.cache_data(ttl=3600)
 def get_last_modified_date_from_github():
     api_url = "https://api.github.com/repos/BacalhauNaBrisa/varredor_progressivo/commits"
     params = {"path": "progarchives_all_artists_albums.csv", "per_page": 1}
     headers = {
         "Accept": "application/vnd.github+json",
-        "Authorization": f"Bearer {st.secrets['GITHUB_TOKEN']}"
+        "Authorization": f"Bearer {st.secrets.get('GITHUB_TOKEN', '')}"
     }
     try:
         resp = requests.get(api_url, params=params, headers=headers, timeout=10)
         if resp.status_code != 200:
-            return f"Last updated: error {resp.status_code}"
+            return "Last updated on July 4, 2025"
         data = resp.json()
         if not isinstance(data, list) or not data:
-            return "Last updated: no data"
+            return "Last updated on July 4, 2025"
         dt_str = data[0]["commit"]["committer"]["date"]
         dt = datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%SZ")
         return dt.strftime("Last updated on %B %d, %Y")
-    except Exception as e:
-        return "Last updated: error"
+    except Exception:
+        return "Last updated on July 4, 2025"
 
 # Load and cache data
 @st.cache_data(show_spinner=True)
@@ -183,32 +183,6 @@ st.download_button(
     file_name='varredor_progressivo_filtrado.csv',
     mime='text/csv'
 )
-
-# Aggregated statistics
-st.subheader("📈 Estatísticas Agrupadas")
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("#### Média de Avaliação por Estilo")
-    avg_rating_by_style = (
-        filtered_data
-        .groupby('style')['rating']
-        .mean()
-        .sort_values(ascending=False)
-        .reset_index()
-    )
-    st.dataframe(avg_rating_by_style, use_container_width=True)
-
-with col2:
-    st.markdown("#### Média de Weighted Rating por País")
-    avg_weighted_by_country = (
-        filtered_data
-        .groupby('country')['Weighted Rating']
-        .mean()
-        .sort_values(ascending=False)
-        .reset_index()
-    )
-    st.dataframe(avg_weighted_by_country, use_container_width=True)
 
 # Top 10 albums
 st.subheader("🏆 Top 10 Álbuns")
