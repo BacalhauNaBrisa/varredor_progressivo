@@ -30,37 +30,37 @@ Um aplicativo web feito com **Streamlit** para explorar artistas e álbuns de ro
 ```bash
 git clone https://github.com/BacalhauNaBrisa/varredor_progressivo.git
 cd varredor_progressivo
+```
 
-Instale as dependências:
+2. Instale as dependências:
 
+```bash
 pip install -r requirements.txt
+```
 
-Execute localmente:
+3. Execute localmente:
 
+```bash
 streamlit run app.py
+```
 
-Para hospedar no Streamlit Cloud:
+4. Para hospedar no Streamlit Cloud:
 
-Faça o push do repositório no GitHub (já configurado com .streamlit/config.toml para tema padrão)
+  a) Faça o push do repositório no GitHub (já configurado com .streamlit/config.toml para tema padrão)
 
-Crie um novo app no Streamlit Cloud apontando para seu repositório
+  b) Crie um novo app no Streamlit Cloud apontando para seu repositório
 
-O app será automaticamente executado e acessível via URL pública
+  c) O app será automaticamente executado e acessível via URL pública
 
-Arquivos principais
+5. Arquivos principais
 
-    app.py — código do aplicativo Streamlit
+  app.py — código do aplicativo Streamlit
+  requirements.txt — bibliotecas Python necessárias
+  .streamlit/config.toml — configuração do tema padrão (claro ou escuro)
+  progarchives_all_artists_albums.csv — CSV hospedado no GitHub (não incluído no repositório local, carregado remotamente)
 
-    requirements.txt — bibliotecas Python necessárias
+6. Bibliotecas utilizadas
 
-    .streamlit/config.toml — configuração do tema padrão (claro ou escuro)
-
-    progarchives_all_artists_albums.csv — CSV hospedado no GitHub (não incluído no repositório local, carregado remotamente)
-
-Bibliotecas utilizadas
-
-    streamlit
-
-    pandas
-
-    plotly
+  streamlit
+  pandas
+  plotly
