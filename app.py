@@ -19,15 +19,20 @@ def get_last_modified_date_from_github():
     params = {"path": "progarchives_all_artists_albums.csv", "per_page": 1}
     headers = {"Accept": "application/vnd.github+json"}
     try:
-        response = requests.get(api_url, params=params, headers=headers)
-        if response.status_code == 200:
-            commit_date = response.json()[0]["commit"]["committer"]["date"]
-            dt = datetime.strptime(commit_date, "%Y-%m-%dT%H:%M:%SZ")
-            return dt.strftime("Last updated on %B %d, %Y")
-        else:
+        resp = requests.get(api_url, params=params, headers=headers, timeout=10)
+        if resp.status_code != 200:
+            st.error(f"GitHub API error: {resp.status_code}")
             return "Last updated: unknown"
-    except Exception:
-        return "Last updated: error"
+        data = resp.json()
+        if not isinstance(data, list) or not data:
+            st.error("No commit data found for CSV file.")
+            return "Last updated: unknown"
+        dt_str = data[0]["commit"]["committer"]["date"]
+        dt = datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%SZ")
+        return dt.strftime("Last updated on %B %d, %Y")
+    except Exception as e:
+        st.error(f"Error fetching GitHub date: {e}")
+        return "Last updated: unknown"
 
 # Load and cache data
 @st.cache_data(show_spinner=True)
