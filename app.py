@@ -164,6 +164,15 @@ st.sidebar.multiselect(
 
 st.sidebar.button("🔄 Resetar Filtros", on_click=reset_filters)
 
+#Display Logo in st.markdown() Header on the Homepage
+st.markdown(
+    f"<div style='text-align: center;'>"
+    f"<img src='{LOGO_URL}' width='150'><br>"
+    f"<h2 style='margin-top: 0;'>Varredor Progressivo</h2>"
+    f"</div>",
+    unsafe_allow_html=True
+)
+
 # Display country map
 st.subheader("🌍 Mapa Interativo por País")
 st.plotly_chart(get_country_map(data), use_container_width=True)
