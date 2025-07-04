@@ -4,7 +4,7 @@ import plotly.express as px
 import numpy as np
 
 # Constants
-CSV_URL = "https://raw.githubusercontent.com/BacalhauNaBrisa/progarchives-streamlit/main/progarchives_all_artists_albums.csv"
+CSV_URL = "https://raw.githubusercontent.com/BacalhauNaBrisa/varredor_progressivo/main/progarchives_all_artists_albums.csv"
 LOGO_URL = "https://github.com/BacalhauNaBrisa/varredor_progressivo/raw/main/assets/logo.png"
 
 # Config
