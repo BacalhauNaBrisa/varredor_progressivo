@@ -55,8 +55,11 @@ streamlit run app.py
 5. Arquivos principais
 
   app.py — código do aplicativo Streamlit
+  
   requirements.txt — bibliotecas Python necessárias
+  
   .streamlit/config.toml — configuração do tema padrão (claro ou escuro)
+
   progarchives_all_artists_albums.csv — CSV hospedado no GitHub (não incluído no repositório local, carregado remotamente)
 
 6. Bibliotecas utilizadas
