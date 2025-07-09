@@ -187,7 +187,9 @@ if st.session_state.selected_years:
 # Show filtered table
 st.subheader("📊 Filtered Albums Table")
 st.dataframe(
-    filtered_data.sort_values(by='Weighted Rating', ascending=False).reset_index(drop=True),
+    filtered_data.sort_values(by='Weighted Rating', ascending=False)
+    .reset_index(drop=True)
+    .set_index(pd.Index(range(1, len(filtered_data) + 1))),
     use_container_width=True
 )
 
@@ -213,7 +215,9 @@ with col1:
             .head(10)
         )
         st.dataframe(
-            top_by_style[['artist_name', 'album_name', 'year', 'Weighted Rating']].reset_index(drop=True),
+            top_by_style[['artist_name', 'album_name', 'year', 'Weighted Rating']]
+            .reset_index(drop=True)
+            .set_index(pd.Index(range(1, len(top_by_style) + 1))),
             use_container_width=True
         )
 
@@ -230,6 +234,8 @@ with col2:
             .head(10)
         )
         st.dataframe(
-            top_by_country[['artist_name', 'album_name', 'year', 'Weighted Rating']].reset_index(drop=True),
+            top_by_country[['artist_name', 'album_name', 'year', 'Weighted Rating']]
+            .reset_index(drop=True)
+            .set_index(pd.Index(range(1, len(top_by_country) + 1))),
             use_container_width=True
         )
