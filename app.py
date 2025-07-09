@@ -151,15 +151,13 @@ st.sidebar.selectbox(
 st.sidebar.multiselect(
     "Filtrar por Estilo(s)",
     style_options,
-    default=st.session_state.selected_styles,
-    key="selected_styles"
+    key="selected_styles"  # <- removed `default=...`
 )
 
 st.sidebar.multiselect(
     "Filtrar por Ano(s)",
     year_options,
-    default=st.session_state.selected_years,
-    key="selected_years"
+    key="selected_years"  # <- removed `default=...`
 )
 
 st.sidebar.button("🔄 Resetar Filtros", on_click=reset_filters)
