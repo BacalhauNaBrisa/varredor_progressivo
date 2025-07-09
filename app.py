@@ -123,21 +123,21 @@ st.sidebar.button(
 
 # Initialize filter state
 if "selected_country" not in st.session_state:
-    st.session_state.selected_country = "Todos"
+    st.session_state.selected_country = "All"
 if "selected_styles" not in st.session_state:
     st.session_state.selected_styles = []
 if "selected_years" not in st.session_state:
     st.session_state.selected_years = []
 
 def reset_filters():
-    st.session_state.selected_country = "Todos"
+    st.session_state.selected_country = "All"
     st.session_state.selected_styles = []
     st.session_state.selected_years = []
 
 # Sidebar filters
 st.sidebar.markdown("### 🎛️ Filters")
 
-country_options = ["Todos"] + sorted(data['country'].dropna().unique().tolist())
+country_options = ["All"] + sorted(data['country'].dropna().unique().tolist())
 style_options = sorted(data['style'].dropna().unique().tolist())
 year_options = sorted(data['year'].dropna().unique().astype(int))
 
@@ -177,7 +177,7 @@ st.plotly_chart(get_country_map(data), use_container_width=True)
 
 # Filter data
 filtered_data = data.copy()
-if st.session_state.selected_country != "Todos":
+if st.session_state.selected_country != "All":
     filtered_data = filtered_data[filtered_data['country'] == st.session_state.selected_country]
 if st.session_state.selected_styles:
     filtered_data = filtered_data[filtered_data['style'].isin(st.session_state.selected_styles)]
@@ -213,7 +213,7 @@ with col1:
 
 with col2:
     st.markdown("#### By country")
-    if st.session_state.selected_country != "Todos":
+    if st.session_state.selected_country != "All":
         st.markdown(f"**Country:** {st.session_state.selected_country}")
         top_by_country = (
             filtered_data[filtered_data['country'] == st.session_state.selected_country]
