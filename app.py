@@ -75,7 +75,7 @@ def get_country_map(df):
         locationmode='country names',
         color='count',
         color_continuous_scale='Viridis',
-        title='🌍 Número de Álbuns por País',
+        title='# of albums by country',
     )
     fig.update_layout(margin=dict(l=0, r=0, t=30, b=0))
     return fig
@@ -111,13 +111,13 @@ else:
 st.sidebar.image(LOGO_URL, width=150)
 st.sidebar.markdown(f"🗓️ {get_last_modified_date_from_github()}")
 st.sidebar.title("Varredor Progressivo")
-st.sidebar.markdown("Explore artistas e álbuns de rock progressivo")
+st.sidebar.markdown("Explore progressive rock artists and albums")
 
 # Theme toggle
 st.sidebar.markdown("---")
-st.sidebar.write("**Tema:**")
+st.sidebar.write("**Theme:**")
 st.sidebar.button(
-    f"Trocar para {'Dark' if st.session_state.theme == 'light' else 'Light'} Mode",
+    f"Change to {'Dark' if st.session_state.theme == 'light' else 'Light'} Mode",
     on_click=toggle_theme
 )
 
@@ -135,32 +135,32 @@ def reset_filters():
     st.session_state.selected_years = []
 
 # Sidebar filters
-st.sidebar.markdown("### 🎛️ Filtros")
+st.sidebar.markdown("### 🎛️ Filters")
 
 country_options = ["Todos"] + sorted(data['country'].dropna().unique().tolist())
 style_options = sorted(data['style'].dropna().unique().tolist())
 year_options = sorted(data['year'].dropna().unique().astype(int))
 
 st.sidebar.selectbox(
-    "Filtrar por País",
+    "Filter by country",
     country_options,
     index=country_options.index(st.session_state.selected_country),
     key="selected_country"
 )
 
 st.sidebar.multiselect(
-    "Filtrar por Estilo(s)",
+    "Filter by style(s)",
     style_options,
     key="selected_styles"  # <- removed `default=...`
 )
 
 st.sidebar.multiselect(
-    "Filtrar por Ano(s)",
+    "Filter by year(s)",
     year_options,
     key="selected_years"  # <- removed `default=...`
 )
 
-st.sidebar.button("🔄 Resetar Filtros", on_click=reset_filters)
+st.sidebar.button("🔄 Reset filters", on_click=reset_filters)
 
 #Display Logo in st.markdown() Header on the Homepage
 st.markdown(
@@ -172,7 +172,7 @@ st.markdown(
 )
 
 # Display country map
-st.subheader("🌍 Mapa Interativo por País")
+st.subheader("🌍 Interactive map by country")
 st.plotly_chart(get_country_map(data), use_container_width=True)
 
 # Filter data
@@ -185,25 +185,25 @@ if st.session_state.selected_years:
     filtered_data = filtered_data[filtered_data['year'].isin(st.session_state.selected_years)]
 
 # Show filtered table
-st.subheader("📊 Tabela de Álbuns Filtrados")
+st.subheader("📊 Filtered albums")
 st.dataframe(filtered_data.sort_values(by='Weighted Rating', ascending=False), use_container_width=True)
 
 # Export filtered data
 st.download_button(
-    label="📥 Exportar CSV Filtrado",
+    label="📥 Export filtered .CSV file",
     data=filtered_data.to_csv(index=False).encode('utf-8'),
     file_name='varredor_progressivo_filtrado.csv',
     mime='text/csv'
 )
 
 # Top 10 albums
-st.subheader("🏆 Top 10 Álbuns")
+st.subheader("🏆 Top 10 Albums")
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("#### Por Estilo")
+    st.markdown("#### By style")
     for style in st.session_state.selected_styles[:1]:
-        st.markdown(f"**Estilo:** {style}")
+        st.markdown(f"**Style:** {style}")
         top_by_style = (
             filtered_data[filtered_data['style'] == style]
             .sort_values(by='Weighted Rating', ascending=False)
@@ -212,9 +212,9 @@ with col1:
         st.dataframe(top_by_style[['artist_name', 'album_name', 'year', 'Weighted Rating']], use_container_width=True)
 
 with col2:
-    st.markdown("#### Por País")
+    st.markdown("#### By country")
     if st.session_state.selected_country != "Todos":
-        st.markdown(f"**País:** {st.session_state.selected_country}")
+        st.markdown(f"**Country:** {st.session_state.selected_country}")
         top_by_country = (
             filtered_data[filtered_data['country'] == st.session_state.selected_country]
             .sort_values(by='Weighted Rating', ascending=False)
