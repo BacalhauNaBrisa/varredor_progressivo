@@ -186,7 +186,10 @@ if st.session_state.selected_years:
 
 # Show filtered table
 st.subheader("📊 Filtered Albums Table")
-st.dataframe(filtered_data.sort_values(by='Weighted Rating', ascending=False), use_container_width=True)
+st.dataframe(
+    filtered_data.sort_values(by='Weighted Rating', ascending=False).reset_index(drop=True),
+    use_container_width=True
+)
 
 # Export filtered data
 st.download_button(
@@ -209,7 +212,10 @@ with col1:
             .sort_values(by='Weighted Rating', ascending=False)
             .head(10)
         )
-        st.dataframe(top_by_style[['artist_name', 'album_name', 'year', 'Weighted Rating']], use_container_width=True)
+        st.dataframe(
+            top_by_style[['artist_name', 'album_name', 'year', 'Weighted Rating']].reset_index(drop=True),
+            use_container_width=True
+        )
 
 with col2:
     st.markdown("#### By Country")
@@ -223,4 +229,7 @@ with col2:
             .sort_values(by='Weighted Rating', ascending=False)
             .head(10)
         )
-        st.dataframe(top_by_country[['artist_name', 'album_name', 'year', 'Weighted Rating']], use_container_width=True)
+        st.dataframe(
+            top_by_country[['artist_name', 'album_name', 'year', 'Weighted Rating']].reset_index(drop=True),
+            use_container_width=True
+        )
