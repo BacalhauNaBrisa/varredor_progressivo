@@ -239,3 +239,15 @@ with col2:
             .set_index(pd.Index(range(1, len(top_by_country) + 1))),
             use_container_width=True
         )
+
+# --- Buy Me A Coffee Button ---
+st.markdown(
+    """
+    <div style="text-align: center; margin-top: 2em;">
+        <a href="https://www.buymeacoffee.com/bacalhau" target="_blank">
+            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
