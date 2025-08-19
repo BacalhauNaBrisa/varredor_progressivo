@@ -240,13 +240,18 @@ with col2:
             use_container_width=True
         )
 
-# --- Buy Me A Coffee Button ---
+# --- Ko-Fi Donation Panel (replaces Buy Me A Coffee) ---
 st.markdown(
     """
-    <div style="text-align: center; margin-top: 2em;">
-        <a href="https://www.buymeacoffee.com/bacalhau" target="_blank">
-            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
-        </a>
+    <div style="display:flex;justify-content:center;margin-top:2em;">
+      <div style="max-width:700px;width:100%;">
+        <iframe id="kofiframe"
+                src="https://ko-fi.com/bacalhaunabrisa/?hidefeed=true&widget=true&embed=true&preview=true"
+                style="border:none;width:100%;padding:4px;background:transparent;"
+                height="712"
+                title="bacalhaunabrisa">
+        </iframe>
+      </div>
     </div>
     """,
     unsafe_allow_html=True
